@@ -40,6 +40,8 @@
   header h1{margin:0;font-size:25px;letter-spacing:.06em;text-transform:uppercase;color:var(--green);font-weight:700}
   header p{margin:8px 0 0;color:var(--orange);font-size:13.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:600}
   nav{display:flex;justify-content:center;gap:min(0.6vw,3px);padding:min(2vw,9px) 0 0;background:transparent;border:0}
+  nav a.on{background:rgba(255,255,255,.13);color:#fff;box-shadow:inset 0 0 0 2px var(--gold)}
+  nav a{transition:background .15s ease,box-shadow .15s ease,color .15s ease}
   nav a{flex:1;max-width:160px;text-align:center;font-family:inherit;-webkit-tap-highlight-color:transparent;font-size:min(3.05vw,13px);font-weight:700;letter-spacing:.02em;color:#e8dcc0;padding:min(2.5vw,11px) min(1vw,4px);border-radius:6px;text-transform:uppercase;display:block;text-decoration:none;white-space:nowrap}
   
   .tab{display:block;scroll-margin-top:clamp(108px,28vw,156px)}
@@ -164,6 +166,7 @@
     <ul>
       <li>Breakfast · <b>~11:00 AM</b>Cab or rideshare to Harry Reid Intl, about 15 minutes</li>
       <li><b>1:30 PM</b>Mom flies home · Southwest 421, nonstop to Pittsburgh, in at 8:55 PM <span class="tag">BOOKED · CP5V93</span></li>
+      <li>André flies out separately the same afternoon ✈✈</li>
     </ul></div>
   <div class="note" style="border-color:var(--orange);background:#fdf1ec;color:#7a3a1c"><b>⚠ Fix first:</b> the Vegas room is booked <b>Sunday only</b> — we need <b>Monday night</b> too (~$200), since Mom now flies home Tuesday. Also push the car return from <b>10 AM</b> to Sunday afternoon; we do not reach Vegas until about 12:30. Still open: Denver, Provo and Kanab hotels.</div>
   <div class="note"><b>Good to know:</b> Arizona (Page, North Rim) is 1 hour behind Utah in September. The North Rim sits at 8,000 ft — bring layers even on warm days. One park pass covers Bryce, the North Rim, and Zion.</div>
@@ -173,7 +176,7 @@
 <section id="tab-map" class="tab">
   <h2 style="margin:22px 14px 8px;color:var(--green);text-transform:uppercase;letter-spacing:.08em;font-size:16px">🗺️ Map</h2>
   <div class="mapwrap"><img src="map.jpg" loading="lazy" decoding="async" alt="Route map: Denver to Provo by train, then Bryce, the North Rim, Zion and Las Vegas by car"></div>
-  <div class="note" style="margin:10px 12px"><b>Reading the map:</b> dashed gray is the Zephyr, Denver to Provo. Coloured lines are our drives — everything after Thursday runs out and back from Kanab. Numbers match the days in the itinerary.</div>
+  <div class="note" style="margin:10px 12px"><b>Reading the map:</b> dashed gray is the Zephyr, Denver to Provo. Coloured lines are our drives — everything after Thursday runs out and back from Kanab. Nights: Denver Tue · Provo Wed · Kanab Thu–Sat · Las Vegas Sun + Mon. We fly home separately on Tuesday the 15th.</div>
 </section>
 
 
@@ -195,7 +198,7 @@
   <div class="cap"><b>Zion Canyon</b> · Saturday<br><span>2,000-ft sandstone walls above the Virgin River. Every shuttle stop is a viewpoint; lunch at the historic Zion Lodge.</span></div></div>
 
   <div class="sight"><img src="bellagio.jpg" loading="lazy" decoding="async" alt="Bellagio fountains on the Las Vegas Strip">
-  <div class="cap"><b>Bellagio fountains</b> · Sunday evening<br><span>A short walk from where we are staying. They run every 15 minutes after 8 PM, set to music, and the last show is at midnight.</span></div></div>
+  <div class="cap"><b>Viva Las Vegas</b> · Sunday &amp; Monday evening<br><span>Two nights on the Strip. The Bellagio fountains run every 15 minutes after 8 PM, set to music, and the conservatory next door is free and indoors.</span></div></div>
 </section>
 
 <!-- BUDGET -->
@@ -232,5 +235,32 @@
 
 
 
+
+<script>
+(function(){
+  var links = Array.prototype.slice.call(document.querySelectorAll('nav a'));
+  var secs  = links.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  function bar(){ var b=document.querySelector('.topbar'); return b?b.offsetHeight:120; }
+  function mark(i){
+    links.forEach(function(a,n){ a.classList.toggle('on', n===i); });
+  }
+  function update(){
+    var line = bar() + 12, best = 0;
+    secs.forEach(function(s,i){
+      if(s && s.getBoundingClientRect().top <= line) best = i;
+    });
+    if(window.innerHeight + window.scrollY >= document.body.scrollHeight - 4) best = secs.length-1;
+    mark(best);
+  }
+  var tick=false;
+  window.addEventListener('scroll', function(){
+    if(tick) return; tick=true;
+    requestAnimationFrame(function(){ update(); tick=false; });
+  }, {passive:true});
+  window.addEventListener('resize', update);
+  links.forEach(function(a,i){ a.addEventListener('click', function(){ mark(i); }); });
+  update();
+})();
+</script>
 </body>
 </html>
