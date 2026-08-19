@@ -229,15 +229,17 @@
 (function(){
   var links = Array.prototype.slice.call(document.querySelectorAll('nav a'));
   var secs  = links.map(function(a){ return document.querySelector(a.getAttribute('href')); });
-  function bar(){ var b=document.querySelector('.topbar'); return b?b.offsetHeight:120; }
-  function mark(i){
-    links.forEach(function(a,n){ a.classList.toggle('on', n===i); });
-  }
+  function barH(){ var b=document.querySelector('.topbar'); return b?b.offsetHeight:120; }
+  function mark(i){ links.forEach(function(a,n){ a.classList.toggle('on', n===i); }); }
   function update(){
-    var line = bar() + 12, best = 0;
+    var top = barH(), bot = window.innerHeight, best = 0, bestArea = -1;
     secs.forEach(function(s,i){
-      if(s && s.getBoundingClientRect().top <= line) best = i;
+      if(!s) return;
+      var r = s.getBoundingClientRect();
+      var area = Math.min(r.bottom, bot) - Math.max(r.top, top);   // visible height
+      if(area > bestArea){ bestArea = area; best = i; }
     });
+    if(window.scrollY < 10) best = 0;
     if(window.innerHeight + window.scrollY >= document.body.scrollHeight - 4) best = secs.length-1;
     mark(best);
   }
@@ -247,7 +249,10 @@
     requestAnimationFrame(function(){ update(); tick=false; });
   }, {passive:true});
   window.addEventListener('resize', update);
-  links.forEach(function(a,i){ a.addEventListener('click', function(){ mark(i); }); });
+  window.addEventListener('load', update);
+  links.forEach(function(a,i){
+    a.addEventListener('click', function(){ mark(i); setTimeout(update, 600); });
+  });
   update();
 })();
 </script>
